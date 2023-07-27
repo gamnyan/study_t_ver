@@ -16,6 +16,47 @@ public class MadangService {
 	public Book getBook(int id) {
 		return dao.selectBookById(id);
 	}
+	
+	public Book getBookOrBlank(int id) {
+		Book rtn = null;
+
+		rtn = dao.selectBookById(id);
+
+		if (rtn == null) {
+			rtn = new Book();
+			rtn.setId(-1);
+			rtn.setTitle("");
+			rtn.setPublisher("");
+			rtn.setPrice(0);
+		}
+		return rtn;
+	}
+	
+	public void addOrSetBook(Book book) {
+		if(book.getId() == -1) {
+			addBook(book);
+		}else {
+			setBook(book);
+		}
+	}
+	
+	public void addBook(Book book) {
+		dao.insertBook(book);
+	}
+	
+	public void setBook(Book book) {
+		dao.updateBook(book);
+	}
+	
+	public void removeBook(int id) throws HasOrderingException {
+		boolean hasOrdering = hasOrderingCustomer(id);
+		
+		if(hasOrdering) {
+			throw new HasOrderingException("Book has ordering");
+		} else {
+			dao.deleteCustomer(id);
+		}		
+	}
 
 	public List<Customer> getCustomer() {
 		return dao.selectCustomer();
@@ -33,8 +74,15 @@ public class MadangService {
 			rtn.setAddress("");
 			rtn.setPhone("");
 		}
-
 		return rtn;
+	}
+	
+	public void addOrSetCustomer(Customer customer) {
+		if(customer.getId() == -1) {
+			addCustomer(customer);
+		}else {
+			setCustomer(customer);
+		}
 	}
 	
 	public void addCustomer(Customer customer) {
@@ -45,8 +93,14 @@ public class MadangService {
 		dao.updateCustomer(customer);
 	}
 	
-	public void removeCustomer(int id) {
-		dao.deleteCustomer(id);
+	public void removeCustomer(int id) throws HasOrderingException {
+		boolean hasOrdering = hasOrderingCustomer(id);
+		
+		if(hasOrdering) {
+			throw new HasOrderingException("Customer has ordering");
+		} else {
+			dao.deleteCustomer(id);
+		}		
 	}
 	
 	public List<Ordering> getOrdering(){
@@ -61,6 +115,16 @@ public class MadangService {
 		boolean rtn = false;
 		
 		if(dao.selectCountByCustomerId(customerId) > 0) {
+			rtn = true;
+		}
+		
+		return rtn;
+	}
+	
+	boolean hasOrderingBook(int bookId) {
+		boolean rtn = false;
+		
+		if(dao.selectCountByBookId(bookId) > 0) {
 			rtn = true;
 		}
 		

@@ -10,7 +10,7 @@ import java.util.List;
 
 public class NewsDAO {
 	final String JDBC_DRIVER = "org.h2.Driver";
-	final String JDBC_URL = "jdbc:h2:tcp://localhost/C:/java/H2/data/jwbookdb";
+	final String JDBC_URL = "jdbc:h2:tcp://localhost/C:/Java/H2/data/jwbookdb";
 
 	// DB 연결을 가져오는 메서드
 	public Connection open() {
@@ -29,7 +29,7 @@ public class NewsDAO {
 		Connection conn = open();
 		List<News> newsList = new ArrayList<>();
 
-		String sql = "select aid, title, PARSEDATETIME(date, 'yyyy-MM-dd hh:mm:ss')as cdate from news";
+		String sql = "select aid, title, FORMATDATETIME(date, 'yyyy-MM-dd hh:mm:ss')as cdate from news";
 		PreparedStatement pstmt = conn.prepareStatement(sql);
 		ResultSet rs = pstmt.executeQuery();
 
@@ -49,7 +49,7 @@ public class NewsDAO {
 	public News getNews(int aid) throws SQLException {
 		Connection conn = open();
 		News n = new News();
-		String sql = "select aid, title, img, PARSEDATETIME(date, 'yyyy-MM-dd hh:mm:ss')as cdate, content from news where aid=?";
+		String sql = "select aid, title, img, FORMATDAT(date, 'yyyy-MM-dd hh:mm:ss')as cdate, content from news where aid=?";
 		PreparedStatement pstmt = conn.prepareStatement(sql);
 		pstmt.setInt(1, aid);
 		ResultSet rs = pstmt.executeQuery();

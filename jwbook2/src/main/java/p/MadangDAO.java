@@ -1,12 +1,38 @@
 package p;
 
-import javax.naming.*;
+import java.io.IOException;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+
+import javax.naming.Context;
+import javax.naming.InitialContext;
+import javax.naming.NamingException;
 import javax.sql.DataSource;
-import java.sql.*;
-import java.util.*;
+
+import org.apache.commons.dbutils.QueryLoader;
+import org.apache.commons.dbutils.QueryRunner;
+import org.apache.commons.dbutils.ResultSetHandler;
+import org.apache.commons.dbutils.handlers.BeanHandler;
+import org.apache.commons.dbutils.handlers.BeanListHandler;
 
 public class MadangDAO {
 	protected DataSource dataSource;
+
+	final static String QUERY_PATH = "/p/madang_sql.properties";
+	final static Map<String, String> QM;
+	static {
+		try {
+			QM = QueryLoader.instance().load(QUERY_PATH);
+		} catch (IOException ioe) {
+			ioe.printStackTrace();
+			throw new ExceptionInInitializerError(ioe);
+		}
+	}
 
 	public MadangDAO() {
 		try {
@@ -17,22 +43,40 @@ public class MadangDAO {
 			ne.printStackTrace();
 		}
 	}
-	
-	public List<Book> selectBook() {
-		List<Book> rtn = new ArrayList<>();
 
-		String sql = "SELECT id, title, publisher, price FROM book";
-		try (Connection c = dataSource.getConnection();
-				PreparedStatement ps = c.prepareStatement(sql);
-				ResultSet rs = ps.executeQuery();) {
-			while (rs.next()) {
-				Book book = new Book();
-				book.setId(rs.getInt("id"));
-				book.setTitle(rs.getString("title"));
-				book.setPublisher(rs.getString("publisher"));
-				book.setPrice(rs.getInt("price"));
-				rtn.add(book);
-			}
+	public List<Book> selectBook() {
+		/*
+		 * List<Book> rtn = new ArrayList<>();
+		 * 
+		 * try (Connection c = dataSource.getConnection(); PreparedStatement ps =
+		 * c.prepareStatement(QM.get("selectBook")); ResultSet rs = ps.executeQuery();)
+		 * { while (rs.next()) { Book book = new Book(); book.setId(rs.getInt("id"));
+		 * book.setTitle(rs.getString("title"));
+		 * book.setPublisher(rs.getString("publisher"));
+		 * book.setPrice(rs.getInt("price")); rtn.add(book); }
+		 * 
+		 * } catch (SQLException sqle) { sqle.printStackTrace(); }
+		 * 
+		 * return rtn;
+		 */
+
+		/*
+		 * // dbutils 적용 List<Book> rtn = new ArrayList<>(); List<Book> rtn = new
+		 * ArrayList<>(); try (Connection c = dataSource.getConnection()) { QueryRunner
+		 * qr = new QueryRunner(); ResultSetHandler<List<Book>> h = new
+		 * BeanListHandler<>(Book.class); rtn = qr.query(c, QM.get("selectBook"), h);
+		 * 
+		 * } catch (SQLException sqle) { sqle.printStackTrace(); }
+		 * 
+		 * return rtn;
+		 */
+
+		// dataSource를 아예 QueryRunner안에 넣어버려서 코드 줄여버리기
+		List<Book> rtn = new ArrayList<>();
+		try {
+			QueryRunner qr = new QueryRunner(dataSource);
+			ResultSetHandler<List<Book>> h = new BeanListHandler<>(Book.class);
+			rtn = qr.query(QM.get("selectBook"), h);
 
 		} catch (SQLException sqle) {
 			sqle.printStackTrace();
@@ -42,118 +86,303 @@ public class MadangDAO {
 	}
 
 	public Book selectBookById(int id) {
+		/*
+		 * Book rtn = null;
+		 * 
+		 * try (Connection c = dataSource.getConnection(); PreparedStatement ps =
+		 * c.prepareStatement(QM.get("selectBookById"));) { ps.setInt(1, id); try
+		 * (ResultSet rs = ps.executeQuery();) { if (rs.next()) { Book book = new
+		 * Book(); book.setId(rs.getInt("id")); book.setTitle(rs.getString("title"));
+		 * book.setPublisher(rs.getString("publisher"));
+		 * book.setPrice(rs.getInt("price")); } }
+		 * 
+		 * } catch (SQLException sqle) { sqle.printStackTrace(); }
+		 * 
+		 * return rtn;
+		 */
+
+		/*
+		 * // dbutils 적용 Book rtn = null;
+		 * 
+		 * try (Connection c = dataSource.getConnection()) { QueryRunner qr = new
+		 * QueryRunner(); ResultSetHandler<Book> h = new BeanHandler<>(Book.class);
+		 * Object[] p = { id }; rtn = qr.query(c, QM.get("selectBookById"), h, p); }
+		 * catch (SQLException sqle) { sqle.printStackTrace(); }
+		 * 
+		 * return rtn;
+		 */
+
+		// dataSource를 아예 QueryRunner안에 넣어버려서 코드 줄여버리기
 		Book rtn = null;
 
-		String sql = "SELECT id, title, publisher, price FROM book WHERE id = ?";
-		try (Connection c = dataSource.getConnection(); PreparedStatement ps = c.prepareStatement(sql);) {
-			ps.setInt(1, id);
-			try (ResultSet rs = ps.executeQuery();) {
-				if (rs.next()) {
-					Book book = new Book();
-					book.setId(rs.getInt("id"));
-					book.setTitle(rs.getString("title"));
-					book.setPublisher(rs.getString("publisher"));
-					book.setPrice(rs.getInt("price"));
-				}
-			}
-
+		try {
+			QueryRunner qr = new QueryRunner(dataSource);
+			ResultSetHandler<Book> h = new BeanHandler<>(Book.class);
+			Object[] p = { id };
+			rtn = qr.query(QM.get("selectBookById"), h, p);
 		} catch (SQLException sqle) {
 			sqle.printStackTrace();
 		}
 
 		return rtn;
 	}
-	
+
+	public void insertBook(Book book) {
+
+		/*
+		 * try (Connection c = dataSource.getConnection(); PreparedStatement ps =
+		 * c.prepareStatement(QM.get("insertBook"))) { ps.setString(1, book.getTitle());
+		 * ps.setString(2, book.getPublisher()); ps.setInt(3, book.getPrice());
+		 * ps.executeUpdate(); } catch (SQLException sqle) { sqle.printStackTrace(); }
+		 */
+
+		/*
+		 * // dbutils 적용 try (Connection c = dataSource.getConnection()) { QueryRunner
+		 * qr = new QueryRunner(); Object[] p = { book.getTitle(), book.getPublisher(),
+		 * book.getPrice() }; qr.execute(c, QM.get("insertBook"), p); } catch
+		 * (SQLException sqle) { sqle.printStackTrace(); }
+		 */
+
+		// dataSource를 아예 QueryRunner안에 넣어버려서 코드 줄여버리기
+		try {
+			QueryRunner qr = new QueryRunner(dataSource);
+			Object[] p = { book.getTitle(), book.getPublisher(), book.getPrice() };
+			qr.execute(QM.get("insertBook"), p);
+		} catch (SQLException sqle) {
+			sqle.printStackTrace();
+		}
+
+	}
+
+	public void updateBook(Book book) {
+
+		try (Connection c = dataSource.getConnection();
+				PreparedStatement ps = c.prepareStatement(QM.get("updateBook"))) {
+			ps.setString(1, book.getTitle());
+			ps.setString(2, book.getPublisher());
+			ps.setInt(3, book.getPrice());
+			ps.setInt(4, book.getId());
+			ps.executeUpdate();
+		} catch (SQLException sqle) {
+			sqle.printStackTrace();
+		}
+
+		// dbutils 적용
+		try (Connection c = dataSource.getConnection()) {
+			QueryRunner qr = new QueryRunner();
+			Object[] p = { book.getTitle(), book.getPublisher(), book.getPrice() };
+			qr.execute(c, QM.get("updateBook"), p);
+		} catch (SQLException sqle) {
+			sqle.printStackTrace();
+		}
+
+		// dataSource를 아예 QueryRunner안에 넣어버려서 코드 줄여버리기
+		try {
+			QueryRunner qr = new QueryRunner(dataSource);
+			Object[] p = { book.getTitle(), book.getPublisher(), book.getPrice() };
+			qr.execute(QM.get("updateBook"), p);
+		} catch (SQLException sqle) {
+			sqle.printStackTrace();
+		}
+	}
+
+	public void deleteBook(int id) throws HasOrderingException {
+
+		/*
+		 * try (Connection c = dataSource.getConnection(); PreparedStatement ps =
+		 * c.prepareStatement(QM.get("deleteBook"))) { ps.setInt(1, id);
+		 * ps.executeUpdate(); } catch (SQLException sqle) { sqle.printStackTrace(); }
+		 */
+
+		/*
+		 * // dbutils 적용 try (Connection c = dataSource.getConnection()) { QueryRunner
+		 * qr = new QueryRunner(); Object[] p = { id }; qr.execute(c,
+		 * QM.get("deleteBook"), p); } catch (SQLException sqle) {
+		 * sqle.printStackTrace(); }
+		 */
+
+		// dataSource를 아예 QueryRunner안에 넣어버려서 코드 줄여버리기
+		try {
+			QueryRunner qr = new QueryRunner(dataSource);
+			Object[] p = { id };
+			qr.execute(QM.get("deleteBook"), p);
+		} catch (SQLException sqle) {
+			sqle.printStackTrace();
+		}
+	}
+
 	public List<Customer> selectCustomer() {
+		/*
+		 * List<Customer> rtn = new ArrayList<>();
+		 * 
+		 * try (Connection c = dataSource.getConnection(); PreparedStatement ps =
+		 * c.prepareStatement(QM.get("selectCustomer")); ResultSet rs =
+		 * ps.executeQuery();) { while (rs.next()) { Customer customer = new Customer();
+		 * customer.setId(rs.getInt("id")); customer.setName(rs.getString("name"));
+		 * customer.setAddress(rs.getString("address"));
+		 * customer.setPhone(rs.getString("phone")); rtn.add(customer); }
+		 * 
+		 * } catch (SQLException sqle) { sqle.printStackTrace(); }
+		 * 
+		 * return rtn;
+		 */
+
+		// dbutils 적용
+		/*
+		 * List<Customer> rtn = new ArrayList<>();
+		 * 
+		 * try (Connection c = dataSource.getConnection()) { QueryRunner qr = new
+		 * QueryRunner(); ResultSetHandler<List<Customer>> h = new
+		 * BeanListHandler<>(Customer.class); rtn = qr.query(c,
+		 * QM.get("selectCustomer"), h);
+		 * 
+		 * } catch (SQLException sqle) { sqle.printStackTrace(); }
+		 * 
+		 * return rtn;
+		 */
+
+		// dataSource를 아예 QueryRunner안에 넣어버려서 코드 줄여버리기
 		List<Customer> rtn = new ArrayList<>();
 
-		String sql = "SELECT id, name, address, phone FROM customer";
-		try (Connection c = dataSource.getConnection();
-				PreparedStatement ps = c.prepareStatement(sql);
-				ResultSet rs = ps.executeQuery();) {
-			while (rs.next()) {
-				Customer customer = new Customer();
-				customer.setId(rs.getInt("id"));
-				customer.setName(rs.getString("name"));
-				customer.setAddress(rs.getString("address"));
-				customer.setPhone(rs.getString("phone"));
-				rtn.add(customer);
-			}
-
+		try {
+			QueryRunner qr = new QueryRunner(dataSource);
+			ResultSetHandler<List<Customer>> h = new BeanListHandler<>(Customer.class);
+			rtn = qr.query(QM.get("selectCustomer"), h);
 		} catch (SQLException sqle) {
 			sqle.printStackTrace();
 		}
 
 		return rtn;
 	}
-	
+
 	public Customer selectCustomerById(int id) {
+		/*
+		 * Customer rtn = null;
+		 * 
+		 * try (Connection c = dataSource.getConnection(); PreparedStatement ps =
+		 * c.prepareStatement(QM.get("selectCustomerById"));) {
+		 * 
+		 * ps.setInt(1, id); try (ResultSet rs = ps.executeQuery();) { if (rs.next()) {
+		 * rtn = new Customer(); rtn.setId(rs.getInt("id"));
+		 * rtn.setName(rs.getString("name")); rtn.setAddress(rs.getString("address"));
+		 * rtn.setPhone(rs.getString("phone")); } }
+		 * 
+		 * } catch (SQLException sqle) { sqle.printStackTrace(); }
+		 * 
+		 * return rtn;
+		 */
+
+		/*
+		 * // dbutils 적용 Customer rtn = null;
+		 * 
+		 * try (Connection c = dataSource.getConnection()) { QueryRunner qr = new
+		 * QueryRunner(); ResultSetHandler<Customer> h = new
+		 * BeanHandler<>(Customer.class); Object[] p = { id }; rtn = qr.query(c,
+		 * QM.get("selectCustomerById"), h, p); } catch (SQLException sqle) {
+		 * sqle.printStackTrace(); }
+		 * 
+		 * return rtn;
+		 */
+
+		// dataSource를 아예 QueryRunner안에 넣어버려서 코드 줄여버리기
 		Customer rtn = null;
 
-		String sql = "SELECT id, name, address, phone FROM customer WHERE id = ?";
-		try (Connection c = dataSource.getConnection(); PreparedStatement ps = c.prepareStatement(sql);) {
-			ps.setInt(1, id);
-			try (ResultSet rs = ps.executeQuery();) {
-				if (rs.next()) {
-					rtn = new Customer();
-					rtn.setId(rs.getInt("id"));
-					rtn.setName(rs.getString("name"));
-					rtn.setAddress(rs.getString("address"));
-					rtn.setPhone(rs.getString("phone"));
-				}
-			}
-
+		try {
+			QueryRunner qr = new QueryRunner(dataSource);
+			ResultSetHandler<Customer> h = new BeanHandler<>(Customer.class);
+			Object[] p = { id };
+			rtn = qr.query(QM.get("selectCustomerById"), h, p);
 		} catch (SQLException sqle) {
 			sqle.printStackTrace();
 		}
 
 		return rtn;
 	}
-	
+
 	public void insertCustomer(Customer customer) {
-		String sql = "INSERT INTO customer (name, address, phone) VALUES (?,?,?)";
-		
-		try (Connection c = dataSource.getConnection(); PreparedStatement ps = c.prepareStatement(sql);) {
-			ps.setString(1, customer.getName());
-			ps.setString(2, customer.getAddress());
-			ps.setString(3, customer.getPhone());
-			ps.executeUpdate();
-		} catch(SQLException sqle) {
+		/*
+		 * try (Connection c = dataSource.getConnection(); PreparedStatement ps =
+		 * c.prepareStatement(QM.get("insertCustomer"))) { ps.setString(1,
+		 * customer.getName()); ps.setString(2, customer.getAddress()); ps.setString(3,
+		 * customer.getPhone()); ps.executeUpdate(); } catch (SQLException sqle) {
+		 * sqle.printStackTrace(); }
+		 */
+
+		/*
+		 * // dbutils 적용 try (Connection c = dataSource.getConnection()) { QueryRunner
+		 * qr = new QueryRunner(); Object[] p = { customer.getName(),
+		 * customer.getAddress(), customer.getPhone() }; qr.execute(c,
+		 * QM.get("insertCustomer"), p); } catch (SQLException sqle) {
+		 * sqle.printStackTrace(); }
+		 */
+
+		// dataSource를 아예 QueryRunner안에 넣어버려서 코드 줄여버리기
+		try {
+			QueryRunner qr = new QueryRunner(dataSource);
+			Object[] p = { customer.getName(), customer.getAddress(), customer.getPhone() };
+			qr.execute(QM.get("insertCustomer"), p);
+		} catch (SQLException sqle) {
 			sqle.printStackTrace();
 		}
 	}
-	
+
 	public void updateCustomer(Customer customer) {
-		String sql = "UPDATE customer SET name = ?, address = ?, phone = ? WHERE id = ?";
-		
-		try (Connection c = dataSource.getConnection(); PreparedStatement ps = c.prepareStatement(sql);) {
-			ps.setString(1, customer.getName());
-			ps.setString(2, customer.getAddress());
-			ps.setString(3, customer.getPhone());
-			ps.setInt(4, customer.getId());
-			ps.executeUpdate();
-		} catch(SQLException sqle) {
+		/*
+		 * try (Connection c = dataSource.getConnection(); PreparedStatement ps =
+		 * c.prepareStatement(QM.get("updateCustomer"))) { ps.setString(1,
+		 * customer.getName()); ps.setString(2, customer.getAddress()); ps.setString(3,
+		 * customer.getPhone()); ps.setInt(4, customer.getId()); ps.executeUpdate(); }
+		 * catch (SQLException sqle) { sqle.printStackTrace(); }
+		 */
+
+		/*
+		 * // dbutils 적용 try (Connection c = dataSource.getConnection()) { QueryRunner
+		 * qr = new QueryRunner(); Object[] p = { customer.getName(),
+		 * customer.getAddress(), customer.getPhone(), customer.getId() }; qr.execute(c,
+		 * QM.get("updateCustomer"), p); } catch (SQLException sqle) {
+		 * sqle.printStackTrace(); }
+		 */
+
+		// dataSource를 아예 QueryRunner안에 넣어버려서 코드 줄여버리기
+		try {
+			QueryRunner qr = new QueryRunner(dataSource);
+			Object[] p = { customer.getName(), customer.getAddress(), customer.getPhone(), customer.getId() };
+			qr.execute(QM.get("updateCustomer"), p);
+		} catch (SQLException sqle) {
 			sqle.printStackTrace();
 		}
 	}
-	
-	public void deleteCustomer(int id) {
-		String sql = "DELETE FROM customer WHERE id = ?";
-		
-		try (Connection c = dataSource.getConnection(); PreparedStatement ps = c.prepareStatement(sql);) {
-			ps.setInt(1, id);
-			ps.executeUpdate();
-		} catch(SQLException sqle) {
+
+	public void deleteCustomer(int id) throws HasOrderingException {
+		/*
+		 * try (Connection c = dataSource.getConnection(); PreparedStatement ps =
+		 * c.prepareStatement(QM.get("deleteCustomer"))) { ps.setInt(1, id);
+		 * ps.executeUpdate(); } catch (SQLException sqle) { sqle.printStackTrace(); }
+		 */
+
+		/*
+		 * // dbutils 적용 try (Connection c = dataSource.getConnection()) { QueryRunner
+		 * qr = new QueryRunner(); Object[] p = { id }; qr.execute(c,
+		 * QM.get("deleteCustomer"), p); } catch (SQLException sqle) {
+		 * sqle.printStackTrace(); }
+		 */
+
+		// dbutils 적용
+		try {
+			QueryRunner qr = new QueryRunner(dataSource);
+			Object[] p = { id };
+			qr.execute(QM.get("deleteCustomer"), p);
+		} catch (SQLException sqle) {
 			sqle.printStackTrace();
 		}
 	}
-	
+
 	public List<Ordering> selectOrdering() {
+
 		List<Ordering> rtn = new ArrayList<>();
 
-		String sql = "SELECT o.id, o.sellingPrice, o.orderingDate, c.name, b.title FROM ordering o JOIN customer c ON o.customerId = c.id JOIN book b ON o.bookId = b.id";
 		try (Connection c = dataSource.getConnection();
-				PreparedStatement ps = c.prepareStatement(sql);
+				PreparedStatement ps = c.prepareStatement(QM.get("selectOrdering"));
 				ResultSet rs = ps.executeQuery();) {
 			while (rs.next()) {
 				Ordering ordering = new Ordering();
@@ -174,27 +403,66 @@ public class MadangDAO {
 		}
 
 		return rtn;
+
+		/*
+		 * // dbutils 적용 List<Ordering> rtn = new ArrayList<>();
+		 * 
+		 * try (Connection c = dataSource.getConnection()) { QueryRunner qr = new
+		 * QueryRunner(); ResultSetHandler<List<Ordering>> h = new
+		 * BeanListHandler<>(Ordering.class); rtn = qr.query(c,
+		 * QM.get("selectOrdering"), h);
+		 * 
+		 * } catch (SQLException sqle) { sqle.printStackTrace(); }
+		 * 
+		 * return rtn;
+		 */
 	}
-	
+
 	public void insertOrdering(Ordering ordering) {
-		String sql = "INSERT INTO ordering (customerId, bookId, sellingPrice, orderingDate) VALUES (?,?,?,?)";
-		
-		try (Connection c = dataSource.getConnection(); PreparedStatement ps = c.prepareStatement(sql);) {
-			ps.setInt(1, ordering.getCustomerId());
-			ps.setInt(2, ordering.getBookId());
-			ps.setInt(3, ordering.getSellingPrice());
-			ps.setDate(4, new java.sql.Date(new java.util.Date().getTime()));
-			ps.executeUpdate();
-		} catch(SQLException sqle) {
+		/*
+		 * try (Connection c = dataSource.getConnection(); PreparedStatement ps =
+		 * c.prepareStatement(QM.get("insertOrdering"))) { ps.setInt(1,
+		 * ordering.getCustomerId()); ps.setInt(2, ordering.getBookId()); ps.setInt(3,
+		 * ordering.getSellingPrice()); ps.setDate(4, new java.sql.Date(new
+		 * java.util.Date().getTime())); ps.executeUpdate(); } catch (SQLException sqle)
+		 * { sqle.printStackTrace(); }
+		 */
+
+		// dbutils 적용
+		try (Connection c = dataSource.getConnection()) {
+			QueryRunner qr = new QueryRunner();
+			Object[] p = { ordering.getCustomerId(), ordering.getBookId(), ordering.getSellingPrice(),
+					new java.sql.Date(new java.util.Date().getTime()) };
+			qr.execute(c, QM.get("insertOrdering"), p);
+		} catch (SQLException sqle) {
 			sqle.printStackTrace();
 		}
 	}
-	
+
+	public int selectCountByBookId(int BookId) {
+		int rtn = -1;
+
+		try (Connection c = dataSource.getConnection();
+				PreparedStatement ps = c.prepareStatement(QM.get("selectCountByBookId"))) {
+			ps.setInt(1, BookId);
+			try (ResultSet rs = ps.executeQuery();) {
+				if (rs.next()) {
+					rtn = rs.getInt(1);
+				}
+			}
+
+		} catch (SQLException sqle) {
+			sqle.printStackTrace();
+		}
+
+		return rtn;
+	}
+
 	public int selectCountByCustomerId(int customerId) {
 		int rtn = -1;
 
-		String sql = "SELECT COUNT(*) FROM ordering WHERE customerId = ?";
-		try (Connection c = dataSource.getConnection(); PreparedStatement ps = c.prepareStatement(sql);) {
+		try (Connection c = dataSource.getConnection();
+				PreparedStatement ps = c.prepareStatement(QM.get("selectCountByCustomerId"))) {
 			ps.setInt(1, customerId);
 			try (ResultSet rs = ps.executeQuery();) {
 				if (rs.next()) {
@@ -208,6 +476,5 @@ public class MadangDAO {
 
 		return rtn;
 	}
-	
-	
+
 }

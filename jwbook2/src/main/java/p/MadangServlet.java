@@ -50,6 +50,18 @@ public class MadangServlet extends HttpServlet {
 		case "deleteCustomer":
 			deleteCustomer(request, response);
 			break;
+		case "books":
+			view = books(request, response);
+			break;
+		case "book":
+			view = book(request, response);
+			break;
+		case "updateBook":
+			updateBook(request, response);
+			break;
+		case "deleteBook":
+			deleteBook(request, response);
+			break;
 		}
 
 		if (StringUtils.isNotEmpty(view)) {
@@ -57,6 +69,51 @@ public class MadangServlet extends HttpServlet {
 		}
 	}
 
+	String books(HttpServletRequest request, HttpServletResponse response) {
+		boolean hasOrdering = Boolean
+				.parseBoolean(StringUtils.defaultIfEmpty(request.getParameter("hasOrdering"), "false"));
+		List<Book> bookList = ms.getBook();
+		
+		request.setAttribute("hasOrdering", hasOrdering);
+		request.setAttribute("bookList", bookList);
+		
+		return "/books.jsp";
+	}
+	
+	String book(HttpServletRequest request, HttpServletResponse response) {
+		int id = Integer.parseInt(StringUtils.defaultIfEmpty(request.getParameter("id"), "-1"));
+		Book book = ms.getBookOrBlank(id);
+		request.setAttribute("book", book);
+		
+		return "/book.jsp";
+	}
+	
+	void updateBook(HttpServletRequest request, HttpServletResponse response) throws IOException {
+		Book book = new Book();
+		try {
+			BeanUtils.populate(book, request.getParameterMap());
+			/*
+			 * if (customer.getId() == -1) { ms.addCustomer(customer); } else {
+			 * ms.setCustomer(customer); }
+			 */
+			ms.addOrSetBook(book);
+			response.sendRedirect("madang?action=books");
+		} catch (IllegalAccessException | InvocationTargetException e) {
+			e.printStackTrace();
+		}
+	}
+	
+	void deleteBook(HttpServletRequest request, HttpServletResponse response) throws IOException {
+		int id = Integer.parseInt(StringUtils.defaultIfEmpty(request.getParameter("id"), "-1"));
+		try {
+			ms.removeBook(id);
+			response.sendRedirect("madang?action=books");
+		} catch (HasOrderingException hoe) {
+			response.sendRedirect("madang?action=books&hasOrdering=true");
+		}
+		
+	}
+	
 	String customers(HttpServletRequest request, HttpServletResponse response) {
 		boolean hasOrdering = Boolean
 				.parseBoolean(StringUtils.defaultIfEmpty(request.getParameter("hasOrdering"), "false"));
@@ -80,11 +137,11 @@ public class MadangServlet extends HttpServlet {
 		Customer customer = new Customer();
 		try {
 			BeanUtils.populate(customer, request.getParameterMap());
-			if (customer.getId() == -1) {
-				ms.addCustomer(customer);
-			} else {
-				ms.setCustomer(customer);
-			}
+			/*
+			 * if (customer.getId() == -1) { ms.addCustomer(customer); } else {
+			 * ms.setCustomer(customer); }
+			 */
+			ms.addOrSetCustomer(customer);
 			response.sendRedirect("madang?action=customers");
 		} catch (IllegalAccessException | InvocationTargetException e) {
 			e.printStackTrace();
@@ -93,22 +150,13 @@ public class MadangServlet extends HttpServlet {
 
 	void deleteCustomer(HttpServletRequest request, HttpServletResponse response) throws IOException {
 		int id = Integer.parseInt(StringUtils.defaultIfEmpty(request.getParameter("id"), "-1"));
-
-		boolean hasOrdering = ms.hasOrderingCustomer(id);
-
-		if (hasOrdering) {
-			response.sendRedirect("madang?action=customers&hasOrdering=true");
-		} else {
+		try {
 			ms.removeCustomer(id);
 			response.sendRedirect("madang?action=customers");
+		} catch (HasOrderingException hoe) {
+			response.sendRedirect("madang?action=customers&hasOrdering=true");
 		}
 
-		/*
-		 * try { customerService.remove(id);
-		 * response.sendRedirect("madang?action=customers"); }
-		 * catch(HasOrderingException hoe) {
-		 * response.sendRedirect("madang?action=customers&hasOrdering=true"); }
-		 */
 	}
 
 	String orderings(HttpServletRequest request, HttpServletResponse response) {
