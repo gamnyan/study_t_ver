@@ -49,7 +49,7 @@ public class NewsDAO {
 	public News getNews(int aid) throws SQLException {
 		Connection conn = open();
 		News n = new News();
-		String sql = "select aid, title, img, FORMATDAT(date, 'yyyy-MM-dd hh:mm:ss')as cdate, content from news where aid=?";
+		String sql = "select aid, title, img, FORMATDATETIME(date, 'yyyy-MM-dd hh:mm:ss')as cdate, content from news where aid=?";
 		PreparedStatement pstmt = conn.prepareStatement(sql);
 		pstmt.setInt(1, aid);
 		ResultSet rs = pstmt.executeQuery();
