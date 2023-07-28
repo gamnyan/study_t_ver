@@ -73,10 +73,14 @@
                     <tbody id="orderings">
                         <c:forEach var="ordering" items="${orderingList}">
                             <tr>
-                                <td>${ordering.customer.name}</td>
-                                <td>${ordering.book.title}</td>
-                                <td>${ordering.sellingPrice}</td>
-                                <td><fmt:formatDate value="${ordering.orderingDate}" pattern="yyyy-MM-dd"/></td>
+                                <%-- <td>${ordering.customer.name}</td> --%>
+                                <td>${ordering[3]}</td>
+                                <%-- <td>${ordering.book.title}</td> --%>
+                                <td>${ordering[4]}</td>
+                                <%-- <td>${ordering.sellingPrice}</td> --%>
+                                <td>${ordering[1]}</td>
+                                <%-- <td><fmt:formatDate value="${ordering.orderingDate}" pattern="yyyy-MM-dd"/></td> --%>
+                                <td><fmt:formatDate value="${ordering[2]}" pattern="yyyy-MM-dd"/></td>
                             </tr>
                         </c:forEach>
                     </tbody>

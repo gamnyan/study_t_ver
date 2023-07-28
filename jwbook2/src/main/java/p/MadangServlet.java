@@ -162,7 +162,7 @@ public class MadangServlet extends HttpServlet {
 	String orderings(HttpServletRequest request, HttpServletResponse response) {
 		List<Customer> customerList = ms.getCustomer();
 		List<Book> bookList = ms.getBook();
-		List<Ordering> orderingList = ms.getOrdering();
+		List<Object[]> orderingList = ms.getOrdering();
 
 		request.setAttribute("customerList", customerList);
 		request.setAttribute("bookList", bookList);

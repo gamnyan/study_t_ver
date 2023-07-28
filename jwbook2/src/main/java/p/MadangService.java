@@ -103,7 +103,7 @@ public class MadangService {
 		}		
 	}
 	
-	public List<Ordering> getOrdering(){
+	public List<Object[]> getOrdering(){
 		return dao.selectOrdering();
 	}
 	
