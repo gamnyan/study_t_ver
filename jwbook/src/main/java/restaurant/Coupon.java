@@ -8,49 +8,40 @@
 
 package restaurant;
 
-public class Coupons {
-	private int couponId;
-	private String title;
+public class Coupon {
+	private int id;
+	private String name;
 	private int discount;
 	private boolean doubleDiscount;
 	private String discountType;
-
-	public int getCouponId() {
-		return couponId;
+	
+	public int getId() {
+		return id;
 	}
-
-	public void setCouponId(int couponId) {
-		this.couponId = couponId;
+	public void setId(int id) {
+		this.id = id;
 	}
-
-	public String getTitle() {
-		return title;
+	public String getName() {
+		return name;
 	}
-
-	public void setTitle(String title) {
-		this.title = title;
+	public void setName(String name) {
+		this.name = name;
 	}
-
 	public int getDiscount() {
 		return discount;
 	}
-
 	public void setDiscount(int discount) {
 		this.discount = discount;
 	}
-
 	public boolean isDoubleDiscount() {
 		return doubleDiscount;
 	}
-
 	public void setDoubleDiscount(boolean doubleDiscount) {
 		this.doubleDiscount = doubleDiscount;
 	}
-
 	public String getDiscountType() {
 		return discountType;
 	}
-
 	public void setDiscountType(String discountType) {
 		this.discountType = discountType;
 	}

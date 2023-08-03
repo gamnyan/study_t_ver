@@ -21,10 +21,8 @@
 <body>
 	<div data-role="appbar">
 		<ul class="app-bar-menu">
-			<li><a href="/jwbook/restaurantControl">결제</a></li>
-			<li><a href="/jwbook/restaurant/bills.jsp">결산</a></li>
-			<!-- <li><a href="/c0715/restaurant?action=bill">결제</a></li>
-                <li><a href="/c0715/restaurant?action=bills">결산</a></li> -->
+			<li><a href="/jwbook/restaurantControl?action=bill">결제</a></li>
+			<li><a href="/jwbook/restaurantControl?action=bills">결산</a></li>
 		</ul>
 	</div>
 
@@ -34,9 +32,9 @@
 
 	<div class="container">
 		<h6>메뉴</h6>
-		<c:forEach var="menu" items="${menuList}" varStatus="i">
-			<button class="button menu" data-menu-id="${i.index+1}"
-				data-menu-name="${menu.menuName}" data-menu-price="${menu.price}">${menu.menuName}(${menu.price}원)
+		<c:forEach var="menu" items="${menuList}">
+			<button class="button menu" data-menu-id="${menu.id}"
+				data-menu-name="${menu.name}" data-menu-price="${menu.price}">${menu.name}(${menu.price}원)
 			</button>
 		</c:forEach>
 	</div>
@@ -72,32 +70,32 @@
 		<h6>제휴/할인카드/쿠폰</h6>
 		<select data-role="select" data-filter="false" id="select_credit">
 			<option value="-1">신용카드 선택하세요.</option>
-			<c:forEach var="credit" items="${creditCardList}" varStatus="i"
-				begin="0" end="11">
-				<option value="${i.index+1}">${credit.cardName}</option>
+			<c:forEach var="credit" items="${cardList}" varStatus="i" begin="0"
+				end="11">
+				<option value="${credit.id}">${credit.name}</option>
 			</c:forEach>
 		</select> <select data-role="select" data-filter="false" id="select_telecom">
 			<option value="-1">통신사 선택하세요.</option>
-			<c:forEach var="telecom" items="${creditCardList}" varStatus="i"
-				begin="12" end="15">
-				<option value="${i.index+1}">${telecom.cardName}</option>
+			<c:forEach var="telecom" items="${cardList}" varStatus="i" begin="12"
+				end="15">
+				<option value="${telecom.id}">${telecom.name}</option>
 			</c:forEach>
 		</select> <select data-role="select" data-filter="false" id="select_point">
 			<option value="-1">포인트결제 선택하세요.</option>
-			<c:forEach var="point" items="${creditCardList}" varStatus="i"
-				begin="17" end="22">
-				<option value="${i.index+1}">${point.cardName}</option>
+			<c:forEach var="point" items="${cardList}" varStatus="i" begin="17"
+				end="22">
+				<option value="${point.id}">${point.name}</option>
 			</c:forEach>
 		</select> <select data-role="select" data-filter="false" id="select_okcashbag">
 			<option value="-1">OK캐시백 선택하세요.</option>
-			<c:forEach var="okcashbag" items="${creditCardList}" varStatus="i"
+			<c:forEach var="okcashbag" items="${cardList}" varStatus="i"
 				begin="16" end="16">
-				<option value="${i.index+1}">${okcashbag.cardName}</option>
+				<option value="${okcashbag.id}">${okcashbag.name}</option>
 			</c:forEach>
 		</select> <select data-role="select" data-filter="false" id="select_coupon">
 			<option value="-1">할인쿠폰 선택하세요.</option>
-			<c:forEach var="coupon" items="${couponList}" varStatus="i">
-				<option value="${i.index+1}">${coupon.title}</option>
+			<c:forEach var="coupon" items="${couponList}">
+				<option value="${coupon.id}">${coupon.name}</option>
 			</c:forEach>
 		</select>
 	</div>
@@ -115,12 +113,11 @@
 	<script src="https://cdn.korzh.com/metroui/v4.5.1/js/metro.min.js"></script>
 	<script src="/jwbook/restaurant/addLocale_ko_KR.js"></script>
 	<script>
-	let cardJsonArrayString = '${cardJsonArrayString}';
-	let couponJsonArrayString = '${couponJsonArrayString}';
-	let cards = JSON.parse(cardJsonArrayString);
-	let coupons = JSON.parse(couponJsonArrayString);
+		/* let cardJsonArrayString = '${cardJsonArrayString}';
+		let couponJsonArrayString = '${couponJsonArrayString}';
+		let cards = JSON.parse(cardJsonArrayString);
+		let coupons = JSON.parse(couponJsonArrayString); */
 	</script>
 	<script src="/jwbook/restaurant/bill.js" type="module"></script>
 </body>
 </html>
-321321

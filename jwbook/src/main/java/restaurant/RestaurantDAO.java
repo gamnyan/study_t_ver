@@ -1,6 +1,7 @@
 package restaurant;
 
 import java.io.IOException;
+import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
@@ -14,8 +15,10 @@ import javax.sql.DataSource;
 import org.apache.commons.dbutils.QueryLoader;
 import org.apache.commons.dbutils.QueryRunner;
 import org.apache.commons.dbutils.ResultSetHandler;
+import org.apache.commons.dbutils.handlers.ArrayListHandler;
 import org.apache.commons.dbutils.handlers.BeanHandler;
 import org.apache.commons.dbutils.handlers.BeanListHandler;
+import org.apache.commons.dbutils.handlers.ScalarHandler;
 
 public class RestaurantDAO {
 	protected DataSource dataSource;
@@ -41,12 +44,12 @@ public class RestaurantDAO {
 		}
 	}
 
-	public List<CardTypes> selectCardTypes() {
-		List<CardTypes> rtn = new ArrayList<>();
+	public List<Coupon> selectCoupon() {
+		List<Coupon> rtn = new ArrayList<>();
 		try {
 			QueryRunner qr = new QueryRunner(dataSource);
-			ResultSetHandler<List<CardTypes>> h = new BeanListHandler<>(CardTypes.class);
-			rtn = qr.query(QM.get("selectCardTypes"), h);
+			ResultSetHandler<List<Coupon>> h = new BeanListHandler<>(Coupon.class);
+			rtn = qr.query(QM.get("selectCoupon"), h);
 
 		} catch (SQLException sqle) {
 			sqle.printStackTrace();
@@ -54,12 +57,12 @@ public class RestaurantDAO {
 		return rtn;
 	}
 
-	public List<Coupons> selectCoupons() {
-		List<Coupons> rtn = new ArrayList<>();
+	public List<Card> selectCard() {
+		List<Card> rtn = new ArrayList<>();
 		try {
 			QueryRunner qr = new QueryRunner(dataSource);
-			ResultSetHandler<List<Coupons>> h = new BeanListHandler<>(Coupons.class);
-			rtn = qr.query(QM.get("selectCoupons"), h);
+			ResultSetHandler<List<Card>> h = new BeanListHandler<>(Card.class);
+			rtn = qr.query(QM.get("selectCard"), h);
 
 		} catch (SQLException sqle) {
 			sqle.printStackTrace();
@@ -67,109 +70,113 @@ public class RestaurantDAO {
 		return rtn;
 	}
 
-	public List<CreditCards> selectCreditCards() {
-		List<CreditCards> rtn = new ArrayList<>();
+	public List<Menu> selectMenu() {
+		List<Menu> rtn = new ArrayList<>();
 		try {
 			QueryRunner qr = new QueryRunner(dataSource);
-			ResultSetHandler<List<CreditCards>> h = new BeanListHandler<>(CreditCards.class);
-			rtn = qr.query(QM.get("selectCreditCards"), h);
+			ResultSetHandler<List<Menu>> h = new BeanListHandler<>(Menu.class);
+			rtn = qr.query(QM.get("selectMenu"), h);
 
 		} catch (SQLException sqle) {
 			sqle.printStackTrace();
 		}
 		return rtn;
 	}
+	
+	public List<Object[]> selectBill(){
+		List<Object[]> rtn = new ArrayList<>();
 
-	public List<Drinks> selectDrinks() {
-		List<Drinks> rtn = new ArrayList<>();
 		try {
 			QueryRunner qr = new QueryRunner(dataSource);
-			ResultSetHandler<List<Drinks>> h = new BeanListHandler<>(Drinks.class);
-			rtn = qr.query(QM.get("selectDrinks"), h);
-
+			ResultSetHandler<List<Object[]>> h = new ArrayListHandler();
+			rtn = qr.query(QM.get("selectBill"), h);
 		} catch (SQLException sqle) {
 			sqle.printStackTrace();
 		}
 		return rtn;
 	}
-
-	public List<Menus> selectMenus() {
-		List<Menus> rtn = new ArrayList<>();
-		try {
-			QueryRunner qr = new QueryRunner(dataSource);
-			ResultSetHandler<List<Menus>> h = new BeanListHandler<>(Menus.class);
-			rtn = qr.query(QM.get("selectMenus"), h);
-
-		} catch (SQLException sqle) {
-			sqle.printStackTrace();
-		}
-		return rtn;
-	}
-
-	public CardTypes selectCardTypesById(int cardTypeId) {
-		CardTypes rtn = null;
-
-		try {
-			QueryRunner qr = new QueryRunner(dataSource);
-			ResultSetHandler<CardTypes> h = new BeanHandler<>(CardTypes.class);
-			Object[] p = { cardTypeId };
-			rtn = qr.query(QM.get("selectCardTypesById"), h, p);
-		} catch (SQLException sqle) {
-			sqle.printStackTrace();
-		}
-		return rtn;
-	}
-	public Coupons selectCouponsById(int couponId) {
-		Coupons rtn = null;
+	
+	public List<Object[]> selectLineItem(){
+		List<Object[]> rtn = new ArrayList<>();
 		
 		try {
 			QueryRunner qr = new QueryRunner(dataSource);
-			ResultSetHandler<Coupons> h = new BeanHandler<>(Coupons.class);
-			Object[] p = { couponId };
-			rtn = qr.query(QM.get("selectCouponsById"), h, p);
+			ResultSetHandler<List<Object[]>> h = new ArrayListHandler();
+			rtn = qr.query(QM.get("selectLineItem"), h);
 		} catch (SQLException sqle) {
 			sqle.printStackTrace();
 		}
 		return rtn;
 	}
-	public CreditCards selectCreditCardsById(int cardId) {
-		CreditCards rtn = null;
+	
+	public Coupon selectCouponById(int id) {
+		Coupon rtn = null;
 		
 		try {
 			QueryRunner qr = new QueryRunner(dataSource);
-			ResultSetHandler<CreditCards> h = new BeanHandler<>(CreditCards.class);
-			Object[] p = { cardId };
-			rtn = qr.query(QM.get("selectCreditCardsById"), h, p);
+			ResultSetHandler<Coupon> h = new BeanHandler<>(Coupon.class);
+			Object[] p = { id };
+			rtn = qr.query(QM.get("selectCouponById"), h, p);
 		} catch (SQLException sqle) {
 			sqle.printStackTrace();
 		}
 		return rtn;
 	}
-	public Drinks selectDrinksById(int drinkId) {
-		Drinks rtn = null;
+	public Card selectCardById(int id) {
+		Card rtn = null;
 		
 		try {
 			QueryRunner qr = new QueryRunner(dataSource);
-			ResultSetHandler<Drinks> h = new BeanHandler<>(Drinks.class);
-			Object[] p = { drinkId };
-			rtn = qr.query(QM.get("selectDrinksById"), h, p);
+			ResultSetHandler<Card> h = new BeanHandler<>(Card.class);
+			Object[] p = { id };
+			rtn = qr.query(QM.get("selectCardById"), h, p);
 		} catch (SQLException sqle) {
 			sqle.printStackTrace();
 		}
 		return rtn;
 	}
-	public Menus selectMenusById(int menuId) {
-		Menus rtn = null;
+	
+	public Menu selectMenuById(int id) {
+		Menu rtn = null;
 		
 		try {
 			QueryRunner qr = new QueryRunner(dataSource);
-			ResultSetHandler<Menus> h = new BeanHandler<>(Menus.class);
-			Object[] p = { menuId };
-			rtn = qr.query(QM.get("selectMenusById"), h, p);
+			ResultSetHandler<Menu> h = new BeanHandler<>(Menu.class);
+			Object[] p = { id };
+			rtn = qr.query(QM.get("selectMenuById"), h, p);
 		} catch (SQLException sqle) {
 			sqle.printStackTrace();
 		}
 		return rtn;
+	}
+	
+	public void insertBill(Bill bill) {
+		try(Connection c = dataSource.getConnection()){
+			c.setAutoCommit(false);
+			try {
+				QueryRunner qr = new QueryRunner();
+				ScalarHandler<Long> h = new ScalarHandler<>();
+				Object[] p = {};
+				p = new Object[] {
+						bill.getCardId() == -1 ? null : bill.getCardId(),
+						bill.getCouponId() == -1 ? null : bill.getCouponId(),
+						bill.getPrice(),
+						bill.getDiscountPrice(),
+						new java.util.Date()
+				};
+				long billId = qr.insert(c, QM.get("insertBill"), h, p);
+				for(LineItem lineItem : bill.getLineItem()) {
+					p = new Object[] {billId, lineItem.getMenuId(), lineItem.getMenuQuantity()};
+					qr.insert(c, QM.get("insertLineItem"), h, p);
+				}
+				c.commit();
+			} catch(SQLException sqle) {
+				c.rollback();
+				sqle.printStackTrace();
+			}
+		} catch (SQLException sqle) {
+			sqle.printStackTrace();
+		}
 	}
 //
 //	// 뉴스 한 개를 클릭했을 때 세부 내용을 보여주는 메서드

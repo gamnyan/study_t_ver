@@ -8,49 +8,57 @@
 
 package restaurant;
 
-public class CreditCards {
-	private int cardId;
+import org.json.simple.JSONObject;
+
+public class Card {
+	private int id;
 	private String cardType;
-	private String cardName;
+	private String name;
 	private int discount;
 	private String discountType;
-
-	public int getCardId() {
-		return cardId;
+	
+	public String cardJsonArrayString() {
+    	String rtn = null;
+    	
+    	JSONObject jo = new JSONObject();
+    	jo.put("id", id);
+    	jo.put("cardType", cardType);
+    	jo.put("name", name);
+    	jo.put("discount", discount);
+    	jo.put("discountType", discountType);
+    	
+    	rtn = jo.toString();
+    	
+    	return rtn;
+    }
+	
+	public int getId() {
+		return id;
 	}
-
-	public void setCardId(int cardId) {
-		this.cardId = cardId;
+	public void setId(int id) {
+		this.id = id;
 	}
-
 	public String getCardType() {
 		return cardType;
 	}
-
 	public void setCardType(String cardType) {
 		this.cardType = cardType;
 	}
-
-	public String getCardName() {
-		return cardName;
+	public String getName() {
+		return name;
 	}
-
-	public void setCardName(String cardName) {
-		this.cardName = cardName;
+	public void setName(String name) {
+		this.name = name;
 	}
-
 	public int getDiscount() {
 		return discount;
 	}
-
 	public void setDiscount(int discount) {
 		this.discount = discount;
 	}
-
 	public String getDiscountType() {
 		return discountType;
 	}
-
 	public void setDiscountType(String discountType) {
 		this.discountType = discountType;
 	}

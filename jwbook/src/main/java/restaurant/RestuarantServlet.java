@@ -32,9 +32,9 @@ public class RestuarantServlet extends HttpServlet {
 		case "bill":
 			view = bill(request, response);
 			break;
-//		case "bills":
-//			view = bills(request, response);
-//			break;
+		case "bills":
+			view = bills(request, response);
+			break;
 		}
 
 		if (StringUtils.isNotEmpty(view)) {
@@ -44,20 +44,34 @@ public class RestuarantServlet extends HttpServlet {
 
 	public String bill(HttpServletRequest request, HttpServletResponse response) {
 		boolean hasBill = Boolean.parseBoolean(StringUtils.defaultIfEmpty(request.getParameter("hasBill"), "false"));
-		List<CardTypes> cardTypeList = rs.getCardTypes();
-		List<Coupons> couponList = rs.getCoupons();
-		List<CreditCards> creditCardList = rs.getCreditCards();
-		List<Drinks> drinkList = rs.getDrinks();
-		List<Menus> menuList = rs.getMenus();
+		List<Coupon> couponList = rs.getCoupon();
+		List<Card> cardList = rs.getCard();
+		List<Menu> menuList = rs.getMenu();
 
 		request.setAttribute("hasBill", hasBill);
-		request.setAttribute("cardTypeList", cardTypeList);
 		request.setAttribute("couponList", couponList);
-		request.setAttribute("creditCardList", creditCardList);
-		request.setAttribute("drinkList", drinkList);
+		request.setAttribute("cardList", cardList);
 		request.setAttribute("menuList", menuList);
 
 		return "/restaurant/bill.jsp";
+	}
+	
+	public String bills(HttpServletRequest request, HttpServletResponse response) {
+		boolean hasBill = Boolean.parseBoolean(StringUtils.defaultIfEmpty(request.getParameter("hasBill"), "false"));
+		List<Coupon> couponList = rs.getCoupon();
+		List<Card> cardList = rs.getCard();
+		List<Menu> menuList = rs.getMenu();
+		List<Object[]> billList = rs.getBill();
+		List<Object[]> lineItemList = rs.getLineItem();
+		
+		request.setAttribute("hasBill", hasBill);
+		request.setAttribute("couponList", couponList);
+		request.setAttribute("cardList", cardList);
+		request.setAttribute("menuList", menuList);
+		request.setAttribute("billList", billList);
+		request.setAttribute("lineItemList", lineItemList);
+		
+		return "/restaurant/bills.jsp";
 	}
 //	
 //	String bills(HttpServletRequest request, HttpServletResponse response) {

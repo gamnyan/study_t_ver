@@ -118,11 +118,11 @@ function cardChange(event) {
                 if (coupon.discountType == '%') {
                     priceDiscount = priceSum * ((100 - coupon.discount) / 100);
                     $('#coupon_id').val(coupon.id);
-                    $(`<p>쿠폰 중복 할인 %: ${coupon.name}</p>`).appendTo($('#settle_description'));
+                    $(`<p>쿠폰 중복 할인 %: ${coupon.title}</p>`).appendTo($('#settle_description'));
                 } else if (coupon.discountType == 'W') {
                     priceDiscount = priceSum - coupon.discount;
                     $('#coupon_id').val(coupon.id);
-                    $(`<p>쿠폰 중복 할인 W: ${coupon.name} </p>`).appendTo($('#settle_description'));
+                    $(`<p>쿠폰 중복 할인 W: ${coupon.title} </p>`).appendTo($('#settle_description'));
                 }
                 let maxDiscountCard = findMaxDiscountCard(cardIds);
                 if (maxDiscountCard) {
@@ -155,7 +155,7 @@ function cardChange(event) {
                 } else if (couponDiscount > cardDiscount) {
                     priceDiscount = priceSum - couponDiscount;
                     $('#coupon_id').val(coupon.id);
-                    $(`<p>쿠폰 할인 ${coupon.discountType}: ${coupon.name} </p>`).appendTo($('#settle_description'));
+                    $(`<p>쿠폰 할인 ${coupon.discountType}: ${coupon.title} </p>`).appendTo($('#settle_description'));
                 } else if (couponDiscount < cardDiscount) {
                     priceDiscount = priceSum - cardDiscount;
                     if (maxDiscountCard) {
@@ -174,7 +174,7 @@ function cardChange(event) {
                 priceDiscount = priceSum;
             }
         }
-		
+
         $('#price_discount').val(Math.floor(priceDiscount));
         $('#button_settle').removeAttr('disabled');
     } catch (e) {
@@ -231,7 +231,7 @@ function settleClick(event) {
      inputs[i].name = `lineItems[${i}].menuQuantity`;
      }
      */
-    addIndexedName(inputs, 'lineItem', 'menuQuantity');
+    addIndexedName(inputs, 'lineItems', 'menuQuantity');
 
     inputs = $('input.menu_id');
     /*
@@ -239,7 +239,7 @@ function settleClick(event) {
      inputs[i].name = `lineItems[${i}].menuId`;
      }
      */
-    addIndexedName(inputs, 'lineItem', 'menuId');
+    addIndexedName(inputs, 'lineItems', 'menuId');
     $('#form_bill')[0].submit();
 }
 

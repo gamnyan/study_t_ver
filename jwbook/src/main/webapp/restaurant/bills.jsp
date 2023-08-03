@@ -19,8 +19,8 @@
     <body>
         <div data-role="appbar">
             <ul class="app-bar-menu">
-                <li><a href="<c:url value="/restaurant?action=bill"/>">결제</a></li>
-                <li><a href="<c:url value="/restaurant?action=bills"/>">결산</a></li>
+			<li><a href="/jwbook/restaurantControl?action=bill">결제</a></li>
+			<li><a href="/jwbook/restaurantControl?action=bills">결산</a></li>
             </ul>
         </div>
 
