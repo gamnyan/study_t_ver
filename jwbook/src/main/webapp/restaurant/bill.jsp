@@ -123,4 +123,3 @@
 	<script src="/jwbook/restaurant/bill.js" type="module"></script>
 </body>
 </html>
-20230803
