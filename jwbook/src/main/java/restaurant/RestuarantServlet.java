@@ -1,104 +1,72 @@
 package restaurant;
 
 import java.io.IOException;
-import java.lang.reflect.Method;
 import java.util.List;
 
-import javax.servlet.RequestDispatcher;
-import javax.servlet.ServletConfig;
-import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.commons.lang3.StringUtils;
+
 @WebServlet(urlPatterns = "/restaurantControl")
 public class RestuarantServlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 
-	private RestaurantDAO dao;
-	private ServletContext ctx;
+	RestaurantService rs;
 
-	// 웹 리소스 기본 경로 지정
-	private final String START_PAGE = "restaurant/bill.jsp";
-
-	public void init(ServletConfig config) throws ServletException {
-		super.init(config);
-		dao = new RestaurantDAO();
-		ctx = getServletContext();
+	public RestuarantServlet() {
+		super();
+		rs = new RestaurantService();
 	}
 
+	@Override
 	protected void service(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
 		request.setCharacterEncoding("UTF-8");
-		String action = request.getParameter("action");
-
-		dao = new RestaurantDAO();
-
-		// 자바 리플레션을 사용해 if(switch) 없이 요청에 따라 구현 메서드가 실행되도록 구성
-		Method m;
-		String view = null;
-
-		// action 파라미터 없이 접근한 경우
-		if (action == null) {
-//			action = "listCardTypes";
-//			action = "listCoupons";
-//			action = "listCreditCards";
-//			action = "listDrinks";
-//			action = "listMenus";
-			action = "listRestaurant";
+		String action = StringUtils.defaultIfEmpty(request.getParameter("action"), "bill");
+		String view = "";
+		switch (action) {
+		case "bill":
+			view = bill(request, response);
+			break;
+//		case "bills":
+//			view = bills(request, response);
+//			break;
 		}
 
-		try {
-			// 현재 클래스에서 action 이름과 HttpServletRequest를 파라미터로 하는 메서드 찾음
-			m = this.getClass().getMethod(action, HttpServletRequest.class);
-
-			// 메서드 실행 후 리턴값 받아옴
-			view = (String) m.invoke(this, request);
-		} catch (NoSuchMethodException e) {
-			e.printStackTrace();
-			ctx.log("요청 action 없음!!");
-			request.setAttribute("error", "action 파라미터가 잘못되었습니다!!");
-			view = START_PAGE;
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-
-		// POST 요청에서는 리디렉션 방법으로 이동하도록 분기
-		if (view.startsWith("redirect:/")) {
-			String rview = view.substring("redirect:/".length());
-			response.sendRedirect(rview);
-		} else {
-			RequestDispatcher dispatcher = request.getRequestDispatcher(view);
-			dispatcher.forward(request, response);
+		if (StringUtils.isNotEmpty(view)) {
+			getServletContext().getRequestDispatcher(view).forward(request, response);
 		}
 	}
-	
-	public String listRestaurant(HttpServletRequest request) {
-		List<CardTypes> cardTypeList;
-		List<Coupons> couponList;
-		List<CreditCards> creditCardList;
-		List<Drinks> drinkList;
-		List<Menus> menuList;
-		try {
-			cardTypeList = dao.getCardTypes();
-			request.setAttribute("cardTypeList", cardTypeList);
-			couponList = dao.getCoupons();
-			request.setAttribute("couponList", couponList);
-			creditCardList = dao.getCreditCards();
-			request.setAttribute("creditCardList", creditCardList);
-			drinkList = dao.getDrinks();
-			request.setAttribute("drinkList", drinkList);
-			menuList = dao.getMenus();
-			request.setAttribute("menuList", menuList);
-		} catch (Exception e) {
-			e.printStackTrace();
-			ctx.log("메뉴 목록 생성 과정에서 문제 발생!!");
-			request.setAttribute("error", "메뉴 목록이 정상적으로 처리되지 않았습니다!!");
-		}
-		return "restaurant/bill.jsp";
+
+	public String bill(HttpServletRequest request, HttpServletResponse response) {
+		boolean hasBill = Boolean.parseBoolean(StringUtils.defaultIfEmpty(request.getParameter("hasBill"), "false"));
+		List<CardTypes> cardTypeList = rs.getCardTypes();
+		List<Coupons> couponList = rs.getCoupons();
+		List<CreditCards> creditCardList = rs.getCreditCards();
+		List<Drinks> drinkList = rs.getDrinks();
+		List<Menus> menuList = rs.getMenus();
+
+		request.setAttribute("hasBill", hasBill);
+		request.setAttribute("cardTypeList", cardTypeList);
+		request.setAttribute("couponList", couponList);
+		request.setAttribute("creditCardList", creditCardList);
+		request.setAttribute("drinkList", drinkList);
+		request.setAttribute("menuList", menuList);
+
+		return "/restaurant/bill.jsp";
 	}
+//	
+//	String bills(HttpServletRequest request, HttpServletResponse response) {
+//		int id = Integer.parseInt(StringUtils.defaultIfEmpty(request.getParameter("id"), "-1"));
+//		Customer customer = ms.getCustomerOrBlank(id);
+//		request.setAttribute("customer", customer);
+//
+//		return "/customer.jsp";
+//	}
 
 //	public String listCardTypes(HttpServletRequest request) {
 //		List<CardTypes> cardTypeList;
